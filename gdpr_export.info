@@ -1,3 +1,6 @@
 name = GDPR export
 description = This modules allows a user to export all personal data collected about him.
 core = 7.x
+
+files[] = include/data_formatter.inc
+files[] = include/generic_data_formatter.inc
