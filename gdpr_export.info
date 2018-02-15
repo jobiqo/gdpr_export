@@ -1,0 +1,3 @@
+name = GDPR export
+description = This modules allows a user to export all personal data collected about him.
+core = 7.x
