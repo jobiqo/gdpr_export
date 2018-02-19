@@ -5,3 +5,4 @@ core = 7.x
 files[] = include/data_formatter.inc
 files[] = include/generic_data_formatter.inc
 files[] = include/date_formatter.inc
+files[] = include/taxonomy_term_formatter.inc
