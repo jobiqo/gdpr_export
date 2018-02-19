@@ -5,15 +5,21 @@
  */
 class GDPRExportDateFormatter implements GDPRExportDataFormatter {
   // Use the default parameter of format_date as the default date format.
-  private $format = 'medium';
+  private $type;
+  private $format;
 
-  public function __construct($format = null) {
-    if (!empty($format)) {
-      $this->format = $format;
-    }
+  /**
+   * Constructs a new GDPRExportDateFormatter with the given type and formatter,
+   * similar to format_date().
+   *
+   * @see \format_date()
+   */
+  public function __construct($type = 'medium', $format = '') {
+    $this->type = $type;
+    $this->format = $format;
   }
 
   public function format($meta_data) {
-    return format_date($meta_data->value(), $this->format);
+    return format_date($meta_data->value(), $this->type, $this->format);
   }
 }
