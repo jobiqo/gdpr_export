@@ -5,6 +5,11 @@
  * Code for the GDPR export module.
  */
 
+
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+
 /**
  * Returns a list with all the available data formatter.
  *
@@ -36,7 +41,6 @@ function gdpr_export_get_data_formatter(EntityMetadataWrapper $meta_wrapper) {
   $type = $meta_wrapper->info()['type'];
   $formatter = gdpr_export_data_formatter_info();
 
-
   if (isset($formatter[$type])) {
     return new $formatter[$type]();
   }
@@ -47,4 +51,74 @@ function gdpr_export_get_data_formatter(EntityMetadataWrapper $meta_wrapper) {
   }
 
   return new $formatter['default']();
+}
+
+/**
+ * Returns whether the given property is a a list or not.
+ *
+ * @param \EntityMetadataWrapper $meta_wrapper
+ *   The property to check for.
+ *
+ * @return bool
+ *   True if the type is a list
+ */
+function gdpr_export_property_is_list(EntityMetadataWrapper $meta_wrapper) {
+  $type = $meta_wrapper->info()['type'];
+
+  if (entity_property_list_extract_type($type)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Serializes the given entity.
+ *
+ * @param \EntityDrupalWrapper $entity
+ *   The entity to export.
+ * @param string $type
+ *   Type of export, either 'json' or 'xml' (default).
+ * @param string $xml_root_name
+ *   An optional name for the root node. If not set, it will be set to the
+ *   entities type name. Only applicable if $type is 'xml'.
+ *
+ * @return string
+ *   The serialized entity in the selected format, by default xml.
+ */
+function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type='xml', $xml_root_name = NULL) {
+  $normalizers = [];
+  foreach (gdpr_export_get_normalizer_info() as $item) {
+    $normalizers[] = new $item();
+  }
+
+  if (empty($xml_root_name)) {
+    $xml_root_name = $entity->type();
+  }
+
+  $encoders = [new JsonEncoder(), new XmlEncoder($xml_root_name)];
+  //
+  $serializer = new Serializer($normalizers, $encoders);
+  return $serializer->serialize($entity, $type);
+}
+
+/**
+ * Returns a list of normalizers that can be used for the gdpr export.
+ */
+function gdpr_export_get_normalizer_info() {
+  // Register all normalizers.
+  $normalizer_info = module_invoke_all('gdpr_export_normalizer_info');
+  // Allow modules to the normalizer list.
+  drupal_alter('gdpr_export_normalizer_info', $normalizer_info);
+
+  return $normalizer_info;
+}
+
+/**
+ * Implements hook_gdpr_export_normalizer_info().
+ */
+function gdpr_export_gdpr_export_normalizer_info() {
+  // Export the currently only available normalizer.
+  return [
+    'user' => 'GDPRExportUserNormalizer'
+  ];
 }
