@@ -76,11 +76,11 @@ function gdpr_export_get_normalizer_info() {
 function gdpr_export_gdpr_export_normalizer_info() {
   // Export the currently only available normalizer.
   return [
-    'user' => 'GDPRExportUserNormalizer',
     'list' => 'GDPRExportListNormalizer',
     'date' => 'GDPRExportDateNormalizer',
     'generic_data' => 'GDPRExportGenericDataNormalizer',
     'taxonomy_term' => 'GDPRExportTaxonomyTermNormalizer',
-    'taxonomy_term' => 'GDPRExportAddressFieldNormalizer',
+    'addressfield' => 'GDPRExportAddressFieldNormalizer',
+    'field_collection_item' => 'GDPRExportFieldCollectionItem',
   ];
 }
