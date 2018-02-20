@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Provides a normalizer for field collection items.

@@ -29,6 +29,35 @@ function gdpr_export_property_is_list(EntityMetadataWrapper $meta_wrapper) {
 }
 
 /**
+ * Returns a list of normalizers and their weight that can be used for the gdpr
+ * export.
+ */
+function gdpr_export_retrieve_normalizers() {
+  // Register all normalizers. The hooks should return an array, with the
+  // normalizer classes as key and their weight as value. e.g.
+  // ['GDPRExportSpecializedNormalizer' => -10]
+  $normalizers = module_invoke_all('gdpr_export_normalizer_info');
+  // Allow modules to the normalizer list.
+  drupal_alter('gdpr_export_normalizer_info', $normalizers);
+
+  return $normalizers;
+}
+
+/**
+ * Retrieves and instantiates all normalizers in the correct order according to
+ * their weight.
+ */
+function gdpr_export_init_normalizers() {
+  $normalizer_classes = gdpr_export_retrieve_normalizers();
+  asort($normalizer_classes);
+  $normalizers = [];
+  foreach ($normalizer_classes as $class => $weight) {
+    $normalizers[] = new $class();
+  }
+  return $normalizers;
+}
+
+/**
  * Serializes the given entity.
  *
  * @param \EntityDrupalWrapper $entity
@@ -44,7 +73,7 @@ function gdpr_export_property_is_list(EntityMetadataWrapper $meta_wrapper) {
  */
 function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type='xml', $xml_root_name = NULL) {
   $normalizers = [];
-  foreach (gdpr_export_get_normalizer_info() as $item) {
+  foreach (gdpr_export_retrieve_normalizers() as $item) {
     $normalizers[] = new $item();
   }
 
@@ -59,28 +88,16 @@ function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type='xml', 
 }
 
 /**
- * Returns a list of normalizers that can be used for the gdpr export.
- */
-function gdpr_export_get_normalizer_info() {
-  // Register all normalizers.
-  $normalizer_info = module_invoke_all('gdpr_export_normalizer_info');
-  // Allow modules to the normalizer list.
-  drupal_alter('gdpr_export_normalizer_info', $normalizer_info);
-
-  return $normalizer_info;
-}
-
-/**
  * Implements hook_gdpr_export_normalizer_info().
  */
 function gdpr_export_gdpr_export_normalizer_info() {
-  // Export the currently only available normalizer.
+  // Export the default normalizers.
   return [
-    'list' => 'GDPRExportListNormalizer',
-    'date' => 'GDPRExportDateNormalizer',
-    'generic_data' => 'GDPRExportGenericDataNormalizer',
-    'taxonomy_term' => 'GDPRExportTaxonomyTermNormalizer',
-    'addressfield' => 'GDPRExportAddressFieldNormalizer',
-    'field_collection_item' => 'GDPRExportFieldCollectionItem',
+    'GDPRExportDateNormalizer' => -10,
+    'GDPRExportAddressFieldNormalizer' => -10,
+    'GDPRExportTaxonomyTermNormalizer' => 0,
+    'GDPRExportListNormalizer' => 0,
+    'GDPRExportFieldCollectionItem' => 5,
+    'GDPRExportGenericDataNormalizer' => 5,
   ];
 }
