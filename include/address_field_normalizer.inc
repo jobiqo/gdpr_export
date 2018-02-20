@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Provides the addressfield normalizer
+ */
+
 use \Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**

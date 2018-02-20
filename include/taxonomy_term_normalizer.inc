@@ -1,12 +1,20 @@
 <?php
 
+/**
+ * @file
+ * Provides a normalizer for taxonomy term references.
+ */
+
 use \Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * A basic taxonomy term formatter, which simply outputs the referenced terms
- * name.
+ * Implements a basic normalizer for taxonomy terms, which will simply return
+ * the name of the term.
  */
 class GDPRExportTaxonomyTermNormalizer implements NormalizerInterface {
+  /**
+   * @inheritdoc
+   */
   public function normalize($object, $format = NULL, array $context = array()) {
     try {
       return $object->name->value();
@@ -16,6 +24,9 @@ class GDPRExportTaxonomyTermNormalizer implements NormalizerInterface {
     }
   }
 
+  /**
+   * @inheritdoc
+   */
   public function supportsNormalization($data, $format = NULL) {
     return $data instanceof EntityDrupalWrapper
       && $data->info()['type'] == 'taxonomy_term';
