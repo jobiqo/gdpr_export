@@ -97,7 +97,7 @@ function gdpr_export_gdpr_export_normalizer_info() {
     'GDPRExportAddressFieldNormalizer' => -10,
     'GDPRExportTaxonomyTermNormalizer' => 0,
     'GDPRExportListNormalizer' => 0,
-    'GDPRExportFieldCollectionItem' => 5,
+    'GDPRExportFieldCollectionItemNormalizer' => 5,
     'GDPRExportGenericDataNormalizer' => 5,
   ];
 }

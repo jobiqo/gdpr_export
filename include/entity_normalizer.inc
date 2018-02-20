@@ -1,39 +1,82 @@
 <?php
 
+/**
+ * @file
+ * Provides a helper class to implement normalizers based on entities.
+ */
+
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+
 
 /**
- * Provides a generic entity normalization using the formatter system.
+ * Helper class to implement normalizers based on entities.
  */
-abstract class GDPRExportEntityNormalizer implements NormalizerInterface {
+abstract class GDPRExportEntityNormalizer implements NormalizerInterface, NormalizerAwareInterface {
+  use NormalizerAwareTrait;
 
   /**
-   * Returns an array of properties that should be exported.
+   * Returns whether the given object is an entity of the given type.
+   *
+   * @param object $data
+   *   The object which should be checked.
+   * @param string $type
+   *   The type the entity should be.
+   *
+   * @return bool
+   *   TRUE if the given object is an entity of the correct type, FALSE if else.
+   */
+  protected function isEntityType($data, $type) {
+    return $data instanceof EntityDrupalWrapper
+      && $data->type() == $type;
+  }
+
+  /**
+   * Returns whether the given object is an entity of the given type and bundle.
+   *
+   * @param object $data
+   *   The object which should be checked.
+   * @param string $type
+   *   The type the entity should be.
+   * @param $bundle
+   *   The bundle the entity should be.
+   *
+   * @return bool
+   *   TRUE if the given object is an entity of the correct type & bundle, FALSE
+   *   if else.
+   */
+  protected function isEntityBundle($data, $type, $bundle) {
+    return $this->isEntity($data, $type) && $data->getBundle() == $bundle;
+  }
+
+  /**
+   * Returns all normalized fields of the given entity
    *
    * @return array
-   *   An array of properties that should be exported.
+   *   An array containing the the normalized field values, keyed by the field
+   *   names.
    */
-  abstract protected function getProperties();
+  protected function getNormalizedFields($object) {
+    // Get all fields names.
+    $field_names = array_keys(field_info_instances($object->type(),
+      $object->getBundle()));
 
-  /**
-   * @inheritdoc
-   */
-  public function normalize($object, $format = null, array $context = array()) {
-    $property_names = $this->getProperties();
-    $normalization = [];
-
-    foreach ($property_names as $name) {
-      $formatter = gdpr_export_get_data_formatter($object->$name);
-      if (gdpr_export_property_is_list($object->$name)) {
-        $normalization[$name] = [];
-        foreach ($object->$name as $item) {
-          $normalization[$name][] = $formatter->format($item);
-        }
-      } else {
-        $normalization[$name] = $formatter->format($object->$name);
+    $result = [];
+    // Normalize and save it to the results array keyed by the field name.
+    foreach ($field_names as $field_name) {
+      try {
+        $result[$field_name] = $this->normalizer->normalize($object->$field_name);
+      }
+      catch (NotNormalizableValueException $exception) {
+        watchdog_exception('gdpr_export', $exception);
+      }
+      catch (EntityMetadataWrapperException $exception) {
+        watchdog_exception('gdpr_export', $exception);
       }
     }
 
-    return $normalization;
+    return $result;
   }
 }
