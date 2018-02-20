@@ -81,5 +81,6 @@ function gdpr_export_gdpr_export_normalizer_info() {
     'date' => 'GDPRExportDateNormalizer',
     'generic_data' => 'GDPRExportGenericDataNormalizer',
     'taxonomy_term' => 'GDPRExportTaxonomyTermNormalizer',
+    'taxonomy_term' => 'GDPRExportAddressFieldNormalizer',
   ];
 }
