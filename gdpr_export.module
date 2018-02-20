@@ -11,49 +11,6 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
 /**
- * Returns a list with all the available data formatter.
- *
- * @return array
- *   An alterable array of entity property types and the formatter to use.
- */
-function gdpr_export_data_formatter_info() {
-  $info = [
-    'default' => 'GDPRExportGenericDataFormatter',
-    'date' => 'GDPRExportDateFormatter',
-    'taxonomy_term' => 'GDPRExportTaxonomyTermFormatter',
-  ];
-
-  drupal_alter('gdpr_export_data_formatter_info', $info);
-  return $info;
-}
-
-/**
- * Get the correct data formatter for a given field.
- *
- * @param \EntityMetadataWrapper $meta_wrapper
- *   The field or column, for which the formatter should be returned.
- *
- * @return \GDPRExportDataFormatter
- *   The correct data formatter or default one, if no specialized formatter
- *   could be found.
- */
-function gdpr_export_get_data_formatter(EntityMetadataWrapper $meta_wrapper) {
-  $type = $meta_wrapper->info()['type'];
-  $formatter = gdpr_export_data_formatter_info();
-
-  if (isset($formatter[$type])) {
-    return new $formatter[$type]();
-  }
-
-  $type = entity_property_list_extract_type($type);
-  if (!empty($type) && isset($formatter[$type])) {
-    return new $formatter[$type]();
-  }
-
-  return new $formatter['default']();
-}
-
-/**
  * Returns whether the given property is a a list or not.
  *
  * @param \EntityMetadataWrapper $meta_wrapper
@@ -119,6 +76,10 @@ function gdpr_export_get_normalizer_info() {
 function gdpr_export_gdpr_export_normalizer_info() {
   // Export the currently only available normalizer.
   return [
-    'user' => 'GDPRExportUserNormalizer'
+    'user' => 'GDPRExportUserNormalizer',
+    'list' => 'GDPRExportListNormalizer',
+    'date' => 'GDPRExportDateNormalizer',
+    'generic_data' => 'GDPRExportGenericDataNormalizer',
+    'taxonomy_term' => 'GDPRExportTaxonomyTermNormalizer',
   ];
 }
