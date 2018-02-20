@@ -5,10 +5,11 @@
  */
 class GDPRExportUserNormalizer extends GDPRExportEntityNormalizer {
   /**
-   * @inheritdoc
+   * Returns the normalized basic user properties, i.e. the basic user columns.
    */
-  protected function getProperties() {
+  protected function getBasicProperties($object) {
     // @todo: Check that this are really the default drupal core properties.
+    // @todo: Add language as the appropriate normalizer is ready.
     $properties = [
       'uid',
       'name',
@@ -17,18 +18,30 @@ class GDPRExportUserNormalizer extends GDPRExportEntityNormalizer {
       'last_access',
       'last_login',
       'created',
-      'language',
     ];
 
-    drupal_alter('gdpr_export_user_normalizer_fields', $properties);
+    $normalized = [];
+    foreach ($properties as $property) {
+      $normalized[$property] = $this->normalizer->normalize($object->$property);
+    }
 
-    return $properties;
+    return $normalized;
+  }
+
+  public function normalize($object, $format = NULL, array $context = array()) {
+    $result = $this->getBasicProperties($object);
+    $result += $this->getNormalizedFields($object);
+
+    // Allow modules to add or remove properties
+    drupal_alter('gdpr_export_user_normalizer', $result, $object);
+
+    return $result;
   }
 
   /**
    * @inheritdoc
    */
   public function supportsNormalization($data, $format = NULL) {
-    return $data instanceof EntityDrupalWrapper && $data->type() == 'user';
+    return $this->isEntityType($data, 'user');
   }
 }
