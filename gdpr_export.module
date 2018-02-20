@@ -55,18 +55,14 @@ function gdpr_export_init_normalizers() {
  *   The serialized entity in the selected format, by default xml.
  */
 function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type='xml', $xml_root_name = NULL) {
-  $normalizers = [];
-  foreach (gdpr_export_retrieve_normalizers() as $item) {
-    $normalizers[] = new $item();
-  }
-
   if (empty($xml_root_name)) {
     $xml_root_name = $entity->type();
   }
 
+  $normalizers = gdpr_export_init_normalizers();
   $encoders = [new JsonEncoder(), new XmlEncoder($xml_root_name)];
-  //
   $serializer = new Serializer($normalizers, $encoders);
+
   return $serializer->serialize($entity, $type);
 }
 
