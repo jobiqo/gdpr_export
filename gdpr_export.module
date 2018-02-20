@@ -10,23 +10,6 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
-/**
- * Returns whether the given property is a a list or not.
- *
- * @param \EntityMetadataWrapper $meta_wrapper
- *   The property to check for.
- *
- * @return bool
- *   True if the type is a list
- */
-function gdpr_export_property_is_list(EntityMetadataWrapper $meta_wrapper) {
-  $type = $meta_wrapper->info()['type'];
-
-  if (entity_property_list_extract_type($type)) {
-    return TRUE;
-  }
-  return FALSE;
-}
 
 /**
  * Returns a list of normalizers and their weight that can be used for the gdpr
