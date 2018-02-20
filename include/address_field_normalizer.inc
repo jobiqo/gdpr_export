@@ -6,6 +6,9 @@ use \Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * Implements a normalizer for the addressfield.
  */
 class GDPRExportAddressFieldNormalizer implements NormalizerInterface {
+  /**
+   * @inheritdoc
+   */
   public function normalize($object, $format = NULL, array $context = array()) {
     $address = $object->raw();
 
@@ -18,6 +21,9 @@ class GDPRExportAddressFieldNormalizer implements NormalizerInterface {
     return $address;
   }
 
+  /**
+   * @inheritdoc
+   */
   public function supportsNormalization($data, $format = NULL) {
     return $data instanceof EntityStructureWrapper
       && $data->info()['type'] == 'addressfield';
