@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
  * Implements hook_menu().
  */
 function gdpr_export_menu() {
-  $items['user/%user/gdpr_export_download'] = [
+  $items['user/%user/gdpr_export'] = [
     'title' => 'User data export',
     'page callback' => 'gdpr_export_user_export',
     'page arguments' => [1],
@@ -54,7 +54,53 @@ function gdpr_export_user_export_access($account) {
  *   The account for which the user should be exported.
  */
 function gdpr_export_user_export($account) {
+  // Create a directory, where all export files which should be saved.
+  // @todo: figure how to create a truly unique file dir.
+  $directory = 'temporary://gdpr_export_' . $account->uid . '/' . REQUEST_TIME;
+  file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
 
+  // Invoke all hooks that export user data. They should do that by saving a new
+  // file into the given $directory and return the resulting filename
+  // & path from as returned from file_unmanaged_save_data().
+  $files = module_invoke_all('gdpr_export_user_export', $account, $directory);
+
+  // Base name for the zip file and uncompressed folder.
+  $zip_base = $account->uid . '_export';
+  $filename = "$zip_base.zip";
+
+  // @todo: check if this is a good path for the zip file.
+  $zip_path = drupal_realpath("$directory/$filename");
+
+  // Create the zip archive with all the files.
+  $zip = new ZipArchive();
+  $zip->open($zip_path, ZipArchive::CREATE);
+
+  foreach ($files as $file) {
+    $file_path = drupal_realpath($file);
+    $zip->addFile($file_path, "$zip_base/" . basename($file_path));
+  }
+
+  // @todo: Add any files from fields.
+
+  $zip->close();
+
+
+  // Send it to the client. Taken from:
+  // https://drupal.stackexchange.com/questions/33177/how-to-download-zip-file-through-browser
+  // Most of this is only necessary because of IE
+  header("Cache-Control: public");
+  header("Content-Type: application/octet-stream");
+  header("Cache-Control: no-store, no-cache, must-revalidate");
+  header("Cache-Control: post-check=0, pre-check=0");
+  header("Content-Disposition: attachment; filename=\"$filename\";" );
+  header("Content-Transfer-Encoding: binary");
+
+  $fp = fopen($zip_path, 'rb');
+  fpassthru($fp);
+
+  // Delete the directory, so that we don't have any dangling files with
+  // personal information.
+  file_unmanaged_delete_recursive($file_path);
 }
 
 /**
@@ -110,6 +156,16 @@ function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type='xml', 
   $serializer = new Serializer($normalizers, $encoders);
 
   return $serializer->serialize($entity, $type);
+}
+
+/**
+ * Implements hook_gdpr_export_user_export().
+ */
+function gdpr_export_gdpr_export_user_export($account, $directory) {
+  // Export the basic user account data.
+  $meta = entity_metadata_wrapper('user', $account);
+  $data = gdpr_export_serialize_entity($meta);
+  return file_unmanaged_save_data($data, "$directory/user.xml");
 }
 
 /**
