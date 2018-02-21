@@ -80,5 +80,32 @@ function hook_gdpr_export_user_normalizer_alter(&$properties, $user_wrapper) {
 }
 
 /**
+ * Allows to register new files to be exported with the user data.
+ *
+ * If additional data should be exported, for example a profile or a node
+ * related to the account, then modules should implement this hook.
+ * New entities can be exported using gdpr_export_serialize_entity() and should
+ * be saved to the $directory parameter using file_unmanaged_save_data(),
+ * so that data is cleared after the files where zipped and downloaded.
+ * If an existing file should be added to the export, than just return the path
+ * to it.
+ *
+ *
+ * @param object $account
+ *   The user account for which the data should be exported.
+ * @param string $directory
+ *   The directory where new files should be saved to.
+ *
+ * @return bool|string
+ *   A string with the path of the file to export, or FALSE on error.
+ */
+function hook_gdpr_export_user_export($account, $directory) {
+  // Export the basic user account data.
+  $meta = entity_metadata_wrapper('user', $account);
+  $data = gdpr_export_serialize_entity($meta);
+  return file_unmanaged_save_data($data, "$directory/user.xml");
+}
+
+/**
  * @} End of "addtogroup hooks".
  */
