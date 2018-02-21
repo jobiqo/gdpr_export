@@ -10,6 +10,52 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
+/**
+ * Implements hook_menu().
+ */
+function gdpr_export_menu() {
+  $items['user/%user/gdpr_export_download'] = [
+    'title' => 'User data export',
+    'page callback' => 'gdpr_export_user_export',
+    'page arguments' => [1],
+    'access callback' => 'gdpr_export_user_export_access',
+    'access arguments' => [1],
+    'type' => MENU_CALLBACK,
+  ];
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function gdpr_export_permission() {
+  return [
+    'bypass gdpr user export' => [
+      'title' => t('Access any user export'),
+      'description' => t('Allows users to access export data of any user.')
+    ]
+  ];
+}
+
+/**
+ * Access callback for the user export path.
+ */
+function gdpr_export_user_export_access($account) {
+  global $user;
+
+  return user_access('bypass gdpr user export', $user)
+    || $account->uid == $user->uid;
+}
+
+/**
+ * Page callback to export a users data.
+ *
+ * @param \stdClass $account
+ *   The account for which the user should be exported.
+ */
+function gdpr_export_user_export($account) {
+
+}
 
 /**
  * Returns a list of normalizers and their weight that can be used for the gdpr
