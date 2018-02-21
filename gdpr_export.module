@@ -183,3 +183,26 @@ function gdpr_export_gdpr_export_normalizer_info() {
     'GDPRExportGenericDataNormalizer' => 5,
   ];
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function gdpr_export_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+  // @todo: does it makes sense to place the export link in the edit form.
+  global $user;
+  $account_uid = $form['#user']->uid;
+
+  if (user_access('administer users')
+    || $account_uid == $user->uid
+  ) {
+    $form['actions']['gdpr_export_data'] = [
+      '#type' => 'submit',
+      '#value' => t('Export all data'),
+      '#submit' => ['gdpr_export_user_data_submit'],
+    ];
+  }
+}
+
+function gdpr_export_user_data_submit(&$form, &$form_state) {
+  drupal_goto('user/' . $form['#user']->uid . '/gdpr_export');
+}
