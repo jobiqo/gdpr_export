@@ -90,7 +90,6 @@ function hook_gdpr_export_user_normalizer_alter(&$properties, $user_wrapper) {
  * If an existing file should be added to the export, than just return the path
  * to it.
  *
- *
  * @param object $account
  *   The user account for which the data should be exported.
  * @param string $directory
