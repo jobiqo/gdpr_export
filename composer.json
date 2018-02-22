@@ -1,0 +1,15 @@
+{
+    "name": "drupal/gdpr_export",
+    "description": "Drupal module which allows users to export their personal data.",
+    "type": "project",
+    "require": {
+        "symfony/serializer": "3.4"
+    },
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Sebastian",
+            "email": "sep.gil@gmail.com"
+        }
+    ]
+}
