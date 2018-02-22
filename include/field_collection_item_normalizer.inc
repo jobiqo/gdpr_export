@@ -17,7 +17,7 @@ class GDPRExportFieldCollectionItemNormalizer extends GDPRExportEntityNormalizer
   public function normalize($object, $format = NULL, array $context = array()) {
     // In most cases it will be enough to export the fields of a field
     // collection item.
-    $result = $this->getNormalizedFields($object);
+    $result = $this->getNormalizedFields($object, $format, $context);
 
     // Allow modules to alter the fields to export based on the entity meta data
     // wrapper.
