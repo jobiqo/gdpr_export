@@ -82,27 +82,3 @@ function gdpr_export_gdpr_export_normalizer_info() {
     'GDPRExportGenericDataNormalizer' => 5,
   ];
 }
-
-/**
- * Register a managed file that should be sent with the export and return them.
- *
- * @param integer|null $fid
- *   The optional managed file id, to be added to the export. If not set, then
- *   the function will return the file ids that have been added so far.
- *
- * @return array
- *   The file ids, which should be added to export in an array.
- */
-function gdpr_export_register_file_for_export($fid = NULL) {
-  $data = &drupal_static(__FUNCTION__);
-  if (empty($data)) {
-    $data = [];
-  }
-
-  // Only add the passed file id if it's not NULL and not in the array yet.
-  if ($fid !== NULL && !in_array($fid, $data)) {
-    $data[] = $fid;
-  }
-
-  return $data;
-}
