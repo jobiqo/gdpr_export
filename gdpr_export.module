@@ -64,10 +64,13 @@ function gdpr_export_user_export($account) {
   // supported.
   drupal_alter('gdpr_export_user_export_format', $format);
 
+  $context = ['gdpr_export_dir' => $directory];
+  drupal_alter('gdpr_export_user_export_context', $directory);
+
   // Invoke all hooks that export user data. They should do that by saving a new
-  // file into the given $directory and return the resulting filename
-  // & path from as returned from file_unmanaged_save_data().
-  $files = module_invoke_all('gdpr_export_user_export', $account, $directory, $format);
+  // file into the given gdpr_export_dir set in the $context and return the
+  // resulting filename & path from as returned from file_unmanaged_save_data().
+  $files = module_invoke_all('gdpr_export_user_export', $account, $format, $context);
 
   // Base name for the zip file and uncompressed folder.
   $zip_base = $account->uid . '_export';
@@ -150,6 +153,8 @@ function gdpr_export_init_normalizers() {
  *   The entity to export.
  * @param string $type
  *   Type of export, either 'json' or 'xml' (default).
+ * @param array $context
+ *   Options normalizers/encoders have access to.
  * @param string $xml_root_name
  *   An optional name for the root node. If not set, it will be set to the
  *   entities type name. Only applicable if $type is 'xml'.
@@ -157,7 +162,7 @@ function gdpr_export_init_normalizers() {
  * @return string
  *   The serialized entity in the selected format, by default xml.
  */
-function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type='xml', $xml_root_name = NULL) {
+function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type = 'xml', $context = [], $xml_root_name = NULL) {
   if (empty($xml_root_name)) {
     $xml_root_name = $entity->type();
   }
@@ -166,18 +171,18 @@ function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type='xml', 
   $encoders = [new JsonEncoder(), new XmlEncoder($xml_root_name)];
   $serializer = new Serializer($normalizers, $encoders);
 
-  return $serializer->serialize($entity, $type);
+  return $serializer->serialize($entity, $type, $context);
 }
 
 /**
  * Implements hook_gdpr_export_user_export().
  */
-function gdpr_export_gdpr_export_user_export($account, $directory, $format) {
+function gdpr_export_gdpr_export_user_export($account, $format, $context) {
   // Export the basic user account data.
   $meta = entity_metadata_wrapper('user', $account);
-  $data = gdpr_export_serialize_entity($meta, $format);
+  $data = gdpr_export_serialize_entity($meta, $format, $context);
 
-  return file_unmanaged_save_data($data, "$directory/user.$format");
+  return file_unmanaged_save_data($data, $context['gdpr_export_dir'] . "/user.$format");
 }
 
 /**

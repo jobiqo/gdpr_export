@@ -92,16 +92,17 @@ function hook_gdpr_export_user_normalizer_alter(&$properties, $user_wrapper) {
  *
  * @param object $account
  *   The user account for which the data should be exported.
- * @param string $directory
- *   The directory where new files should be saved to.
  * @param string $format
  *   The format which should be used for the export. Currently only 'xml' and
  *   'json' are supported.
+ * @param array $context
+ *   An array of contexts. The default context gdpr_export_dir contains the temp
+ *   directory to which files copied or exported for zipping.
  *
  * @return bool|string
  *   A string with the path of the file to export, or FALSE on error.
  */
-function hook_gdpr_export_user_export($account, $directory, $format) {
+function hook_gdpr_export_user_export($account, $format, $context) {
   // Export a certain profile from the profile2 module. An appropriate profile2
   // would have to be implemented though.
   $profile = profile2_load_by_user($account, 'user_profile');
@@ -118,6 +119,19 @@ function hook_gdpr_export_user_export($account, $directory, $format) {
  */
 function hook_gdpr_export_user_export_format_alter(&$format) {
   $format = 'json';
+}
+
+/**
+ * Alter the contexts passed to the hook_gdpr_export_user_export()
+ * implementations and serializations. Encoders and normalizers will therefore
+ * be able to access those options.
+ *
+ * @param array $context
+ *   An array of contexts to alter. The default context gdpr_export_dir contains
+ *   the temp directory to which files copied or exported for zipping.
+ */
+function hook_gdpr_export_user_export_context_alter(&$context) {
+  $context['some_context'] = 'context_value';
 }
 
 /**
