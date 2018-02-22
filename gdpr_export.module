@@ -50,7 +50,7 @@ function gdpr_export_user_export_access($account) {
 /**
  * Page callback to export a users data.
  *
- * @param \stdClass $account
+ * @param object $account
  *   The account for which the user should be exported.
  */
 function gdpr_export_user_export($account) {
