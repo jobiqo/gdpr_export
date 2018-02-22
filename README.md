@@ -10,7 +10,7 @@ export it. See gdpr_export.api.php for more information on that.
 ## Setup
 
 The module requires the [Entity API](https://www.drupal.org/project/entity)
-module as well as the [Symfony 4.x Serializer](https://www.drupal.org/project/entity).
+module as well as the [Symfony 3.x Serializer](https://symfony.com/doc/3.4/serializer.html).
 
 It is up to you how to add the Symfony Serializer as a dependency. You either
 use either the [composer manager](https://www.drupal.org/project/composer_manager)

@@ -10,6 +10,109 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
+/**
+ * Implements hook_menu().
+ */
+function gdpr_export_menu() {
+  $items['user/%user/gdpr_export'] = [
+    'title' => 'User data export',
+    'page callback' => 'gdpr_export_user_export',
+    'page arguments' => [1],
+    'access callback' => 'gdpr_export_user_export_access',
+    'access arguments' => [1],
+    'type' => MENU_CALLBACK,
+  ];
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function gdpr_export_permission() {
+  return [
+    'bypass gdpr user export' => [
+      'title' => t('Access any user export'),
+      'description' => t('Allows users to access export data of any user.')
+    ]
+  ];
+}
+
+/**
+ * Access callback for the user export path.
+ */
+function gdpr_export_user_export_access($account) {
+  global $user;
+
+  return user_access('bypass gdpr user export', $user)
+    || $account->uid == $user->uid;
+}
+
+/**
+ * Page callback to export a users data.
+ *
+ * @param object $account
+ *   The account for which the user should be exported.
+ */
+function gdpr_export_user_export($account) {
+  // Create a directory, where all export files which should be saved.
+  // @todo: figure how to create a truly unique file dir.
+  $directory = 'temporary://gdpr_export_' . $account->uid . '/' . REQUEST_TIME;
+  file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+
+  $format = 'xml';
+  // Allow modules to alter the format. Currently only xml and json are
+  // supported.
+  drupal_alter('gdpr_export_user_export_format', $format);
+
+  // Invoke all hooks that export user data. They should do that by saving a new
+  // file into the given $directory and return the resulting filename
+  // & path from as returned from file_unmanaged_save_data().
+  $files = module_invoke_all('gdpr_export_user_export', $account, $directory, $format);
+
+  // Base name for the zip file and uncompressed folder.
+  $zip_base = $account->uid . '_export';
+  $filename = "$zip_base.zip";
+
+  // @todo: check if this is a good path for the zip file.
+  $zip_path = drupal_realpath("$directory/$filename");
+
+  // Create the zip archive with all the files.
+  $zip = new ZipArchive();
+  $zip->open($zip_path, ZipArchive::CREATE);
+
+  foreach ($files as $file) {
+    $file_path = drupal_realpath($file);
+    $zip->addFile($file_path, "$zip_base/" . basename($file_path));
+  }
+
+  // @todo: Add any files from fields.
+
+  $zip->close();
+
+
+  // Send it to the client. Taken from:
+  // https://drupal.stackexchange.com/questions/33177/how-to-download-zip-file-through-browser
+  // and @see file_transfer().
+
+  if (ob_get_level()) {
+    ob_end_clean();
+  }
+
+  // Most of this is only necessary because of IE
+  drupal_add_http_header('Cache-Control', 'public, no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+  drupal_add_http_header('Content-Type',  'application/octet-stream');
+  drupal_add_http_header('Content-Disposition', "attachment; filename=$filename;" );
+  drupal_add_http_header('Content-Transfer-Encoding', 'binary');
+
+  $fp = fopen($zip_path, 'rb');
+  fpassthru($fp);
+  fclose($fp);
+
+  // Delete the directory, so that we don't have any dangling files with
+  // personal information.
+  file_unmanaged_delete_recursive($file_path);
+  drupal_exit();
+}
 
 /**
  * Returns a list of normalizers and their weight that can be used for the gdpr
@@ -67,6 +170,17 @@ function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type='xml', 
 }
 
 /**
+ * Implements hook_gdpr_export_user_export().
+ */
+function gdpr_export_gdpr_export_user_export($account, $directory, $format) {
+  // Export the basic user account data.
+  $meta = entity_metadata_wrapper('user', $account);
+  $data = gdpr_export_serialize_entity($meta, $format);
+
+  return file_unmanaged_save_data($data, "$directory/user.$format");
+}
+
+/**
  * Implements hook_gdpr_export_normalizer_info().
  */
 function gdpr_export_gdpr_export_normalizer_info() {
@@ -80,4 +194,27 @@ function gdpr_export_gdpr_export_normalizer_info() {
     'GDPRExportFieldCollectionItemNormalizer' => 5,
     'GDPRExportGenericDataNormalizer' => 5,
   ];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function gdpr_export_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+  // @todo: does it makes sense to place the export link in the edit form.
+  global $user;
+  $account_uid = $form['#user']->uid;
+
+  if (user_access('bypass gdpr user export')
+    || $account_uid == $user->uid
+  ) {
+    $form['actions']['gdpr_export_data'] = [
+      '#type' => 'submit',
+      '#value' => t('Export all data'),
+      '#submit' => ['gdpr_export_user_data_submit'],
+    ];
+  }
+}
+
+function gdpr_export_user_data_submit(&$form, &$form_state) {
+  drupal_goto('user/' . $form['#user']->uid . '/gdpr_export');
 }
