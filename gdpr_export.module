@@ -87,20 +87,26 @@ function gdpr_export_user_export($account) {
 
   // Send it to the client. Taken from:
   // https://drupal.stackexchange.com/questions/33177/how-to-download-zip-file-through-browser
+  // and @see file_transfer().
+
+  if (ob_get_level()) {
+    ob_end_clean();
+  }
+
   // Most of this is only necessary because of IE
-  header("Cache-Control: public");
-  header("Content-Type: application/octet-stream");
-  header("Cache-Control: no-store, no-cache, must-revalidate");
-  header("Cache-Control: post-check=0, pre-check=0");
-  header("Content-Disposition: attachment; filename=\"$filename\";" );
-  header("Content-Transfer-Encoding: binary");
+  drupal_add_http_header("Cache-Control: public, no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+  drupal_add_http_header("Content-Type: application/octet-stream");
+  drupal_add_http_header("Content-Disposition: attachment; filename=\"$filename\";" );
+  drupal_add_http_header("Content-Transfer-Encoding: binary");
 
   $fp = fopen($zip_path, 'rb');
   fpassthru($fp);
+  fclose($fp);
 
   // Delete the directory, so that we don't have any dangling files with
   // personal information.
   file_unmanaged_delete_recursive($file_path);
+  drupal_exit();
 }
 
 /**
