@@ -94,15 +94,28 @@ function hook_gdpr_export_user_normalizer_alter(&$properties, $user_wrapper) {
  *   The user account for which the data should be exported.
  * @param string $directory
  *   The directory where new files should be saved to.
+ * @param string $format
+ *   The format which should be used for the export. Currently only 'xml' and
+ *   'json' are supported.
  *
  * @return bool|string
  *   A string with the path of the file to export, or FALSE on error.
  */
-function hook_gdpr_export_user_export($account, $directory) {
+function hook_gdpr_export_user_export($account, $directory, $format) {
   // Export the basic user account data.
   $meta = entity_metadata_wrapper('user', $account);
-  $data = gdpr_export_serialize_entity($meta);
-  return file_unmanaged_save_data($data, "$directory/user.xml");
+  $data = gdpr_export_serialize_entity($meta, $format);
+  return file_unmanaged_save_data($data, "$directory/user.$format");
+}
+
+/**
+ * Change the format used for the exports.
+ *
+ * @param string $format
+ *   Either json or xml (default).
+ */
+function hook_gdpr_export_user_export_format_alter(&$format) {
+  $format = 'json';
 }
 
 /**

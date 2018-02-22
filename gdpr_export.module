@@ -59,10 +59,15 @@ function gdpr_export_user_export($account) {
   $directory = 'temporary://gdpr_export_' . $account->uid . '/' . REQUEST_TIME;
   file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
 
+  $format = 'xml';
+  // Allow modules to alter the format. Currently only xml and json are
+  // supported.
+  drupal_alter('gdpr_export_user_export_format', $format);
+
   // Invoke all hooks that export user data. They should do that by saving a new
   // file into the given $directory and return the resulting filename
   // & path from as returned from file_unmanaged_save_data().
-  $files = module_invoke_all('gdpr_export_user_export', $account, $directory);
+  $files = module_invoke_all('gdpr_export_user_export', $account, $directory, $format);
 
   // Base name for the zip file and uncompressed folder.
   $zip_base = $account->uid . '_export';
@@ -167,11 +172,12 @@ function gdpr_export_serialize_entity(EntityDrupalWrapper $entity, $type='xml', 
 /**
  * Implements hook_gdpr_export_user_export().
  */
-function gdpr_export_gdpr_export_user_export($account, $directory) {
+function gdpr_export_gdpr_export_user_export($account, $directory, $format) {
   // Export the basic user account data.
   $meta = entity_metadata_wrapper('user', $account);
-  $data = gdpr_export_serialize_entity($meta);
-  return file_unmanaged_save_data($data, "$directory/user.xml");
+  $data = gdpr_export_serialize_entity($meta, $format);
+
+  return file_unmanaged_save_data($data, "$directory/user.$format");
 }
 
 /**
