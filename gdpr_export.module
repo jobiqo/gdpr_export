@@ -83,15 +83,30 @@ function gdpr_export_user_export($account) {
   $zip = new ZipArchive();
   $zip->open($zip_path, ZipArchive::CREATE);
 
-  foreach ($files as $file) {
-    $file_path = drupal_realpath($file);
-    $zip->addFile($file_path, "$zip_base/" . basename($file_path));
+  $real_dir = drupal_realpath($directory);
+
+  $files = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($real_dir),
+    RecursiveIteratorIterator::LEAVES_ONLY
+  );
+
+  foreach ($files as $name => $file)
+  {
+    // Skip directories (they would be added automatically)
+    if (!$file->isDir())
+    {
+      // Get real and relative path for current file
+      $filePath = $file->getRealPath();
+      $relativePath = substr($filePath, strlen($real_dir) + 1);
+
+      // Add current file to archive
+      $zip->addFile($filePath, $relativePath);
+    }
   }
 
   // @todo: Add any files from fields.
 
   $zip->close();
-
 
   // Send it to the client. Taken from:
   // https://drupal.stackexchange.com/questions/33177/how-to-download-zip-file-through-browser
@@ -113,7 +128,7 @@ function gdpr_export_user_export($account) {
 
   // Delete the directory, so that we don't have any dangling files with
   // personal information.
-  file_unmanaged_delete_recursive($file_path);
+  file_unmanaged_delete_recursive($directory);
   drupal_exit();
 }
 
