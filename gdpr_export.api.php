@@ -102,10 +102,12 @@ function hook_gdpr_export_user_normalizer_alter(&$properties, $user_wrapper) {
  *   A string with the path of the file to export, or FALSE on error.
  */
 function hook_gdpr_export_user_export($account, $directory, $format) {
-  // Export the basic user account data.
-  $meta = entity_metadata_wrapper('user', $account);
+  // Export a certain profile from the profile2 module. An appropriate profile2
+  // would have to be implemented though.
+  $profile = profile2_load_by_user($account, 'user_profile');
+  $meta = entity_metadata_wrapper('profile2', $profile);
   $data = gdpr_export_serialize_entity($meta, $format);
-  return file_unmanaged_save_data($data, "$directory/user.$format");
+  return file_unmanaged_save_data($data, "$directory/user_profile.$format");
 }
 
 /**
