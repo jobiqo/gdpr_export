@@ -14,6 +14,8 @@ class GDPRExportImageFieldNormalizer implements NormalizerInterface {
   public function normalize($object, $format = NULL, array $context = array()) {
     $file = $object->value();
 
+    gdpr_export_register_file_for_export($file['fid']);
+
     return [
       'title' => $file['title'],
       'filename' => $file['filename'],
