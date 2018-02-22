@@ -192,7 +192,7 @@ function gdpr_export_form_user_profile_form_alter(&$form, &$form_state, $form_id
   global $user;
   $account_uid = $form['#user']->uid;
 
-  if (user_access('administer users')
+  if (user_access('bypass gdpr user export')
     || $account_uid == $user->uid
   ) {
     $form['actions']['gdpr_export_data'] = [
