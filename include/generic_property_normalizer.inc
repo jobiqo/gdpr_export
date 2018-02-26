@@ -26,6 +26,6 @@ class GDPRExportGenericDataNormalizer implements NormalizerInterface {
     // @todo: Add additional formats like float
     return $data instanceof EntityValueWrapper
       && in_array($data->info()['type'],
-        ['text', 'integer', 'text_formatted', 'boolean', 'uri']);
+        ['text', 'integer', 'text_formatted', 'boolean', 'uri' , 'decimal']);
   }
 }
