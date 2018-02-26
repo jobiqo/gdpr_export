@@ -48,7 +48,7 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
    *   if else.
    */
   protected function isEntityBundle($data, $type, $bundle) {
-    return $this->isEntity($data, $type) && $data->getBundle() == $bundle;
+    return $this->isEntityType($data, $type) && $data->getBundle() == $bundle;
   }
 
   /**
