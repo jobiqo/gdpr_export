@@ -222,7 +222,7 @@ function gdpr_export_gdpr_export_normalizer_info() {
  * Implements hook_form_FORM_ID_alter().
  */
 function gdpr_export_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
-  // @todo: does it makes sense to place the export link in the edit form.
+  // @todo: does it makes sense to place the export link in the edit form?
   global $user;
   $account_uid = $form['#user']->uid;
 
@@ -237,6 +237,9 @@ function gdpr_export_form_user_profile_form_alter(&$form, &$form_state, $form_id
   }
 }
 
+/**
+ * Submit callback for the gdpr export button on the user edit form.
+ */
 function gdpr_export_user_data_submit(&$form, &$form_state) {
   drupal_goto('user/' . $form['#user']->uid . '/gdpr_export');
 }
