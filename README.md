@@ -3,10 +3,6 @@ GDPR Export module
 This module allows a user to export all his data, so that your site is
 compatible with the General Data Protection Regulation (Art. 15 & 20).
 
-It comes with some usefull defaults, but if a site is using additional fields or
-entities, which save user data, you'll have to implement additional code to
-export it. See gdpr_export.api.php for more information on that.
-
 ## Setup
 
 The module requires the [Entity API](https://www.drupal.org/project/entity)
@@ -38,5 +34,11 @@ future if we decide that there's a better place.
 ## Extending
 
 The module comes with several symfony serializers for different entities and
-field types, so that the most common uses are supported. You might have to
-extend if you save more data or have additional modules like profile2.
+field types, so that the most common uses are supported. You might have to 
+implement additional hooks or normalizers if your data depends on extra modules 
+like profile2. It comes with normalizers for 
+[field collections](https://www.drupal.org/project/field_collection), 
+[date](https://www.drupal.org/project/date) and the 
+[address field](https://www.drupal.org/project/addressfield) modules
+See the gdpr_export.api.php file for more information on how to export 
+additional fields.
