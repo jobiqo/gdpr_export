@@ -28,3 +28,15 @@ function your_module_boot() {
 
 The important thing is that the Symfony Serializer classes are available for
 the GDPR Export module to use.
+
+## Usage
+
+The module currently adds a button to the user edit page, which will initialize
+the export and provide the data zipped for download. This might change in the
+future if we decide that there's a better place.
+
+## Extending
+
+The module comes with several symfony serializers for different entities and
+field types, so that the most common uses are supported. You might have to
+extend if you save more data or have additional modules like profile2.
