@@ -70,7 +70,7 @@ function gdpr_export_user_export($account) {
   // Invoke all hooks that export user data. They should do that by saving a new
   // file into the given gdpr_export_dir set in the $context and return the
   // resulting filename & path from as returned from file_unmanaged_save_data().
-  $files = module_invoke_all('gdpr_export_user_export', $account, $format, $context);
+  module_invoke_all('gdpr_export_user_export', $account, $format, $context);
 
   // Base name for the zip file and uncompressed folder.
   $zip_base = $account->uid . '_export';
@@ -197,7 +197,7 @@ function gdpr_export_gdpr_export_user_export($account, $format, $context) {
   $meta = entity_metadata_wrapper('user', $account);
   $data = gdpr_export_serialize_entity($meta, $format, $context);
 
-  return file_unmanaged_save_data($data, $context['gdpr_export_dir'] . "/user.$format");
+  file_unmanaged_save_data($data, $context['gdpr_export_dir'] . "/user.$format");
 }
 
 /**
