@@ -83,8 +83,10 @@ function gdpr_export_user_export($account) {
   $zip = new ZipArchive();
   $zip->open($zip_path, ZipArchive::CREATE);
 
+  // Get the path to export directory.
   $real_dir = drupal_realpath($directory);
 
+  // Get a list of all files in the export dir.
   $files = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator($real_dir),
     RecursiveIteratorIterator::LEAVES_ONLY
@@ -92,26 +94,24 @@ function gdpr_export_user_export($account) {
 
   foreach ($files as $name => $file)
   {
-    // Skip directories (they would be added automatically)
+    // Skip directories (they will be added automatically)
     if (!$file->isDir())
     {
       // Get real and relative path for current file
       $filePath = $file->getRealPath();
       $relativePath = substr($filePath, strlen($real_dir) + 1);
 
-      // Add current file to archive
+      // Add current file to archive, keep the realtive path though, since they
+      // are referenced in the export by the file normalizers.
       $zip->addFile($filePath, $relativePath);
     }
   }
-
-  // @todo: Add any files from fields.
 
   $zip->close();
 
   // Send it to the client. Taken from:
   // https://drupal.stackexchange.com/questions/33177/how-to-download-zip-file-through-browser
   // and @see file_transfer().
-
   if (ob_get_level()) {
     ob_end_clean();
   }
@@ -127,7 +127,7 @@ function gdpr_export_user_export($account) {
   fclose($fp);
 
   // Delete the directory, so that we don't have any dangling files with
-  // personal information.
+  // personal information in the temp dir.
   file_unmanaged_delete_recursive($directory);
   drupal_exit();
 }
