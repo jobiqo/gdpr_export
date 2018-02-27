@@ -40,5 +40,5 @@ like profile2. It comes with normalizers for
 [field collections](https://www.drupal.org/project/field_collection), 
 [date](https://www.drupal.org/project/date) and the 
 [address field](https://www.drupal.org/project/addressfield) modules
-See the gdpr_export.api.php file for more information on how to export 
-additional fields.
+See the gdpr_export.api.php file for more information on how to implement 
+additional normalizers and exports.
