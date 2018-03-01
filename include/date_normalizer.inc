@@ -6,6 +6,7 @@
  */
 
 use \Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
 /**
  * A data formatter for date columns.
  */
