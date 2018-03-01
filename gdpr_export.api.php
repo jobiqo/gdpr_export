@@ -129,7 +129,7 @@ function hook_gdpr_export_user_export_format_alter(&$format) {
  *   the temp directory to which files copied or exported for zipping.
  */
 function hook_gdpr_export_user_export_context_alter(&$context) {
-  $context['some_context'] = 'context_value';
+  $context['gdpr_export_dir'] = 'some_other_dir';
 }
 
 /**
