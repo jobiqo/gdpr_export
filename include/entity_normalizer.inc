@@ -53,12 +53,18 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
 
   /**
    * Returns all normalized fields of the given entity
+   * @param object $object
+   *   Object to normalize
+   * @param string $format
+   *   Format the normalization result will be encoded as
+   * @param array $context
+   *   Context options for the normalizer
    *
-   * @return array
+   * @return array|scalar
    *   An array containing the the normalized field values, keyed by the field
    *   names.
    */
-  protected function getNormalizedFields($object) {
+  protected function getNormalizedFields($object, $format = NULL, array $context = array()) {
     // Get all fields names.
     $field_names = array_keys(field_info_instances($object->type(),
       $object->getBundle()));
@@ -67,7 +73,7 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
     // Normalize and save it to the results array keyed by the field name.
     foreach ($field_names as $field_name) {
       try {
-        $result[$field_name] = $this->normalizer->normalize($object->$field_name);
+        $result[$field_name] = $this->normalizer->normalize($object->$field_name, $format, $context);
       }
       catch (NotNormalizableValueException $exception) {
         watchdog_exception('gdpr_export', $exception);

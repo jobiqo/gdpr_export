@@ -21,7 +21,7 @@ class GDPRExportAddressFieldNormalizer implements NormalizerInterface {
     // addressfield_autocomplete module.
     $address = array_filter($address, function ($value, $key) {
       return !empty($value) && $key != 'data';
-    }, ARRAY_FILTER_USE_BOTH );
+    }, ARRAY_FILTER_USE_BOTH);
 
     return $address;
   }

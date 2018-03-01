@@ -80,34 +80,33 @@ function hook_gdpr_export_user_normalizer_alter(&$properties, $user_wrapper) {
 }
 
 /**
- * Allows to register new files to be exported with the user data.
+ * Allows to export files with the gdpr user export.
  *
  * If additional data should be exported, for example a profile or a node
  * related to the account, then modules should implement this hook.
- * New entities can be exported using gdpr_export_serialize_entity() and should
- * be saved to the $directory parameter using file_unmanaged_save_data(),
- * so that data is cleared after the files where zipped and downloaded.
- * If an existing file should be added to the export, than just return the path
- * to it.
+ * New entities can be exported using gdpr_export_serialize_entity() and have to
+ * be saved to the directory given in $context['gdpr_export_dir'] using
+ * file_unmanaged_save_data(). The function gdpr_export_user_export() will then
+ * zip all the files in $context['gdpr_export_dir'], send it to the client and
+ * remove the directory afterwards.
  *
  * @param object $account
  *   The user account for which the data should be exported.
- * @param string $directory
- *   The directory where new files should be saved to.
  * @param string $format
  *   The format which should be used for the export. Currently only 'xml' and
  *   'json' are supported.
- *
- * @return bool|string
- *   A string with the path of the file to export, or FALSE on error.
+ * @param array $context
+ *   An array of contexts. The default context gdpr_export_dir contains the temp
+ *   directory to which files copied or exported for zipping.
  */
-function hook_gdpr_export_user_export($account, $directory, $format) {
+function hook_gdpr_export_user_export($account, $format, $context) {
   // Export a certain profile from the profile2 module. An appropriate profile2
-  // would have to be implemented though.
+  // normalizer would have to be implemented though.
+  // @see GDPRExportEntityNormalizer.
   $profile = profile2_load_by_user($account, 'user_profile');
   $meta = entity_metadata_wrapper('profile2', $profile);
   $data = gdpr_export_serialize_entity($meta, $format);
-  return file_unmanaged_save_data($data, "$directory/user_profile.$format");
+  file_unmanaged_save_data($data, $context['gdpr_export_dir'] . "/user_profile.$format");
 }
 
 /**
@@ -118,6 +117,19 @@ function hook_gdpr_export_user_export($account, $directory, $format) {
  */
 function hook_gdpr_export_user_export_format_alter(&$format) {
   $format = 'json';
+}
+
+/**
+ * Alter the contexts passed to the hook_gdpr_export_user_export()
+ * implementations and serializations. Encoders and normalizers will therefore
+ * be able to access those options.
+ *
+ * @param array $context
+ *   An array of contexts to alter. The default context gdpr_export_dir contains
+ *   the temp directory to which files copied or exported for zipping.
+ */
+function hook_gdpr_export_user_export_context_alter(&$context) {
+  $context['gdpr_export_dir'] = 'some_other_dir';
 }
 
 /**

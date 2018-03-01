@@ -24,7 +24,7 @@ class GDPRExportListNormalizer implements NormalizerInterface, NormalizerAwareIn
 
     $result = [];
     foreach ($object as $item) {
-      $result[] = $this->normalizer->normalize($item);
+      $result[] = $this->normalizer->normalize($item, $format, $context);
     }
     return $result;
   }
