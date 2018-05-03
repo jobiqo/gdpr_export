@@ -231,6 +231,7 @@ function gdpr_export_form_user_profile_form_alter(&$form, &$form_state, $form_id
       '#type' => 'submit',
       '#value' => t('Export all data'),
       '#submit' => ['gdpr_export_user_data_submit'],
+      '#limit_validation_errors' => array(), // Ignore any required fields the user may or may not have selected.
     ];
   }
 }
@@ -239,5 +240,12 @@ function gdpr_export_form_user_profile_form_alter(&$form, &$form_state, $form_id
  * Submit callback for the gdpr export button on the user edit form.
  */
 function gdpr_export_user_data_submit(&$form, &$form_state) {
-  drupal_goto('user/' . $form['#user']->uid . '/gdpr_export');
+  // Remove destination if set
+  $destination = array();
+  if (isset($_GET['destination'])) {
+    $destination = drupal_get_destination();
+    unset($_GET['destination']);
+  }
+  // Using the form api to redirect
+  $form_state['redirect'] = array('user/' . $form['#user']->uid . '/gdpr_export', array('query' => $destination));
 }
