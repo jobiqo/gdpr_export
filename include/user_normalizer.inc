@@ -35,6 +35,27 @@ class GDPRExportUserNormalizer extends GDPRExportEntityNormalizer {
       $normalized[$property] = $this->normalizer->normalize($object->$property, $format, $context);
     }
 
+    // Export the ip log if the uiplog is enabled.
+    if (module_exists('uiplog')) {
+      $log = db_select('uiplog', 'uip')
+        ->fields('uip', [])
+        ->condition('uid', $object->getIdentifier())
+        ->execute()
+        ->fetchAllAssoc('lid');
+
+      $log = array_map(function($entry) {
+        $time = new DateTime();
+        $time->setTimestamp($entry->timestamp);
+
+        return [
+          'ip' => $entry->ip,
+          'time' => $time->format(DateTime::ISO8601),
+        ];
+      }, $log);
+
+      $normalized['ips'] = array_values($log);
+    }
+
     return $normalized;
   }
 
