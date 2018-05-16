@@ -53,6 +53,23 @@ function hook_gdpr_export_normalizer_info_alter(&$normalizers) {
 }
 
 /**
+ * Alter if the field of an entity should be exported.
+ *
+ * @param bool $should_export
+ *   True if the field should be exported, false if not.
+ * @param array $context
+ *   An array containing the name of the field to be exported in the key
+ *  'field_name' and the entity that contains this field in the key 'entity'
+ */
+function hook_gdpr_export_entity_should_export_field_alter(&$should_export, $context) {
+  if ($context['entity']->type == 'user'
+    && $context['field_name'] == 'field_user_contacts')
+  {
+    $should_export = FALSE;
+  }
+}
+
+/**
  * Alter the fields that the field collection normalizer should return.
  *
  * @param array $fields
