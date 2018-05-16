@@ -19,9 +19,11 @@ class GDPRExportAddressFieldNormalizer implements NormalizerInterface {
 
     // Remove empty values and the data key, added by the
     // addressfield_autocomplete module.
-    $address = array_filter($address, function ($value, $key) {
-      return !empty($value) && $key != 'data';
-    }, ARRAY_FILTER_USE_BOTH);
+    if (!empty($address)) {
+      $address = array_filter($address, function ($value, $key) {
+        return !empty($value) && $key != 'data';
+      }, ARRAY_FILTER_USE_BOTH);
+    }
 
     return $address;
   }
