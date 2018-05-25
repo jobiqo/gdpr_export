@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Code for the GDPR export profile2 module.
+ */
+
+/**
+ * Implements hook_gdpr_export_user_export().
+ */
+function gdpr_export_profile2_gdpr_export_user_export($account, $format, $context) {
+  // Add all profile bundles to the export.
+  $profiles = profile2_load_by_user($account);
+  if (!empty($profiles)) {
+    foreach ($profiles as $profile) {
+      $profile_type = $profile->type;
+      $profile = entity_metadata_wrapper('profile2', $profile->pid);
+      $data = gdpr_export_serialize_entity($profile, $format, $context);
+      file_unmanaged_save_data($data, $context['gdpr_export_dir'] . "/$profile_type.$format");
+    }
+  }
+}
+
+/**
+ * Implements hook_gdpr_export_normalizer_info_alter().
+ */
+function gdpr_export_profile2_gdpr_export_normalizer_info_alter(&$normalizers) {
+  $normalizers['GDPRProfileNormalizer'] = 5;
+}

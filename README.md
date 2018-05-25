@@ -35,10 +35,15 @@ future if we decide that there's a better place.
 
 The module comes with several symfony serializers for different entities and
 field types, so that the most common uses are supported. You might have to 
-implement additional hooks or normalizers if your data depends on extra modules 
-like profile2. It comes with normalizers for 
+implement additional hooks or normalizers if your data depends on extra modules. 
+It comes with normalizers for 
 [field collections](https://www.drupal.org/project/field_collection), 
 [date](https://www.drupal.org/project/date) and the 
-[address field](https://www.drupal.org/project/addressfield) modules
+[address field](https://www.drupal.org/project/addressfield),
+[profile2](https://www.drupal.org/project/profile2) modules.
+
+The Profile2 normalizer is in its own submodule called `gdpr_export_profile2`, 
+which you will have to activate separately. 
+
 See the gdpr_export.api.php file for more information on how to implement 
 additional normalizers and exports.

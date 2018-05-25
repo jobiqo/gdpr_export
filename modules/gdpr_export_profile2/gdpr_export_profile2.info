@@ -1,0 +1,7 @@
+name = GDPR export profile2
+description = This module adds support for gdpr_export support to profile2
+core = 7.x
+package = General Data Protection Regulation
+dependencies[] = gdpr_export
+dependencies[] = profile2
+files[] = include/profile2_normalizer.inc
