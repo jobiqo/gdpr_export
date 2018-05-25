@@ -71,16 +71,12 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
 
     $result = [];
 
-
+    // Allow modules to change the fields to be exported.
     drupal_alter('gdpr_export_entity_fields', $field_names, $object);
 
     // Normalize and save it to the results array keyed by the field name.
     foreach ($field_names as $field_name) {
       try {
-        // Allow modules to alter if a field should be exported or not. This is
-        // especially important for preventing recursions in case there entity
-        // references pointing at each other, like a friends list or similar.
-        // By default we export all fields.
         $result[$field_name] = $this->normalizer->normalize($object->$field_name, $format, $context);
       }
       catch (NotNormalizableValueException $exception) {
