@@ -55,17 +55,14 @@ function hook_gdpr_export_normalizer_info_alter(&$normalizers) {
 /**
  * Alter if the field of an entity should be exported.
  *
- * @param bool $should_export
- *   True if the field should be exported, false if not.
- * @param array $context
- *   An array containing the name of the field to be exported in the key
- *  'field_name' and the entity that contains this field in the key 'entity'
+ * @param array $field_names
+ *   The names of fields that should be exported.
+ * @param \EntityDrupalWrapper $entity_metadata
+ *   The entity meta data wrapper for which the fields should be exported.
  */
-function hook_gdpr_export_entity_should_export_field_alter(&$should_export, $context) {
-  if ($context['entity']->type == 'user'
-    && $context['field_name'] == 'field_user_contacts')
-  {
-    $should_export = FALSE;
+function hook_gdpr_export_entity_fields_alter(&$field_names, $entity_metadata) {
+  if ($entity_metadata->type() == 'user') {
+    $field_names = array_diff($field_names, ['field_user_contacts']);
   }
 }
 
