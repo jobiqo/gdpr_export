@@ -53,7 +53,7 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
 
   /**
    * Returns all normalized fields of the given entity
-   * @param object $object
+   * @param \EntityDrupalWrapper $object
    *   Object to normalize
    * @param string $format
    *   Format the normalization result will be encoded as
