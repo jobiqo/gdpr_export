@@ -64,7 +64,7 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
    *   An array containing the the normalized field values, keyed by the field
    *   names.
    */
-  protected function getNormalizedFields($object, $format = NULL, array $context = array()) {
+  protected function getNormalizedFields(EntityDrupalWrapper $object, $format = NULL, array $context = array()) {
     // Get all fields names.
     $field_names = array_keys(field_info_instances($object->type(),
       $object->getBundle()));
