@@ -53,6 +53,20 @@ function hook_gdpr_export_normalizer_info_alter(&$normalizers) {
 }
 
 /**
+ * Alter if the field of an entity should be exported.
+ *
+ * @param array $field_names
+ *   The names of fields that should be exported.
+ * @param \EntityDrupalWrapper $entity_metadata
+ *   The entity meta data wrapper for which the fields should be exported.
+ */
+function hook_gdpr_export_entity_fields_alter(&$field_names, $entity_metadata) {
+  if ($entity_metadata->type() == 'user') {
+    $field_names = array_diff($field_names, ['field_user_contacts']);
+  }
+}
+
+/**
  * Alter the fields that the field collection normalizer should return.
  *
  * @param array $fields

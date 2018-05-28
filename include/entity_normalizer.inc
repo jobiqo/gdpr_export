@@ -53,7 +53,7 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
 
   /**
    * Returns all normalized fields of the given entity
-   * @param object $object
+   * @param \EntityDrupalWrapper $object
    *   Object to normalize
    * @param string $format
    *   Format the normalization result will be encoded as
@@ -64,12 +64,16 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
    *   An array containing the the normalized field values, keyed by the field
    *   names.
    */
-  protected function getNormalizedFields($object, $format = NULL, array $context = array()) {
+  protected function getNormalizedFields(EntityDrupalWrapper $object, $format = NULL, array $context = array()) {
     // Get all fields names.
     $field_names = array_keys(field_info_instances($object->type(),
       $object->getBundle()));
 
     $result = [];
+
+    // Allow modules to change the fields to be exported.
+    drupal_alter('gdpr_export_entity_fields', $field_names, $object);
+
     // Normalize and save it to the results array keyed by the field name.
     foreach ($field_names as $field_name) {
       try {
