@@ -11,5 +11,6 @@ files[] = include/file_field_normalizer.inc
 files[] = include/generic_property_normalizer.inc
 files[] = include/image_field_normalizer.inc
 files[] = include/list_normalizer.inc
+files[] = include/struct_normalizer.inc
 files[] = include/taxonomy_term_normalizer.inc
 files[] = include/user_normalizer.inc
