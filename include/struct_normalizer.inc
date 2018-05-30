@@ -11,7 +11,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
 /**
- * A data formatter for date columns.
+ * A normalizer for struct fields used by for example date durations or
+ * intervals.
  */
 class GDPRExportStructNormalizer implements NormalizerInterface, NormalizerAwareInterface {
   use NormalizerAwareTrait;
@@ -20,6 +21,7 @@ class GDPRExportStructNormalizer implements NormalizerInterface, NormalizerAware
    * @inheritdoc
    */
   public function normalize($object, $format = NULL, array $context = array()) {
+    // The possible values are stored in the property info.
     $properties = $object->info()['property info'];
 
     $normalized = [];
@@ -32,7 +34,6 @@ class GDPRExportStructNormalizer implements NormalizerInterface, NormalizerAware
       }
     }
 
-    // Export the date in the ISO 8601 format.
     return $normalized;
   }
 
