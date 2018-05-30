@@ -22,7 +22,8 @@ class GDPRExportStructNormalizer implements NormalizerInterface, NormalizerAware
    */
   public function normalize($object, $format = NULL, array $context = array()) {
     // The possible values are stored in the property info.
-    $properties = $object->info()['property info'];
+    $info = $object->info();
+    $properties = $info['property info'];
 
     $normalized = [];
     foreach ($properties as $name => $property) {
@@ -40,7 +41,12 @@ class GDPRExportStructNormalizer implements NormalizerInterface, NormalizerAware
         $normalized[$key] = $this->normalizer->normalize($object->$name);
       }
       catch (NotNormalizableValueException $exception) {
-        watchdog_exception('gdpr_export', $exception);
+        watchdog('gdpr_export', "Could not normalize the property @property of @type in struct @struct with name @name. No supporting normalizer found.", [
+          '@property' => $property['label'],
+          '@type' => $property['type'],
+          '@struct' => $info['label'],
+          '@name' => $info['name'],
+        ], WATCHDOG_WARNING);
       }
     }
 

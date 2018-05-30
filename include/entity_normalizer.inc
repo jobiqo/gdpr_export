@@ -80,7 +80,12 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
         $result[$field_name] = $this->normalizer->normalize($object->$field_name, $format, $context);
       }
       catch (NotNormalizableValueException $exception) {
-        watchdog_exception('gdpr_export', $exception);
+        watchdog('gdpr_export', "Could not normalize the field @field_name with type @field_type in entity @entity with bundle @bundle. No supporting normalizer found.", [
+          '@field_name' => $field_name,
+          '@field_type' => $object->$field_name->info()['type'],
+          '@entity' => $object->type(),
+          '@bundle' => $object->getBundle(),
+        ], WATCHDOG_WARNING);
       }
       catch (EntityMetadataWrapperException $exception) {
         watchdog_exception('gdpr_export', $exception);
