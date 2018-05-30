@@ -210,6 +210,7 @@ function gdpr_export_gdpr_export_normalizer_info() {
     'GDPRExportFileFieldNormalizer' => 0,
     'GDPRExportImageFieldNormalizer' => 0,
     'GDPRExportListNormalizer' => 0,
+    'GDPRExportStructNormalizer' => 0,
     'GDPRExportUserNormalizer' => 5,
     'GDPRExportFieldCollectionItemNormalizer' => 5,
     'GDPRExportGenericDataNormalizer' => 5,
