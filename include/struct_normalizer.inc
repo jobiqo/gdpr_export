@@ -27,6 +27,8 @@ class GDPRExportStructNormalizer implements NormalizerInterface, NormalizerAware
     $normalized = [];
     foreach ($properties as $name => $property) {
       try {
+        // To be able to use the properties label as tag, we need to preprocess
+        // it, to remove spaces and make them a bit cleaner.
         $filter = [
           ' ' => '_',
           '-' => '_',
@@ -34,9 +36,7 @@ class GDPRExportStructNormalizer implements NormalizerInterface, NormalizerAware
           '[' => '_',
           ']' => '',
         ];
-
         $key = drupal_clean_css_identifier(drupal_strtolower($property['label']), $filter);
-        dpm($key);
         $normalized[$key] = $this->normalizer->normalize($object->$name);
       }
       catch (NotNormalizableValueException $exception) {
