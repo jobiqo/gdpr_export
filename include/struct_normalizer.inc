@@ -27,7 +27,17 @@ class GDPRExportStructNormalizer implements NormalizerInterface, NormalizerAware
     $normalized = [];
     foreach ($properties as $name => $property) {
       try {
-        $normalized[$property['label']] = $this->normalizer->normalize($object->$name);
+        $filter = [
+          ' ' => '_',
+          '-' => '_',
+          '/' => '_',
+          '[' => '_',
+          ']' => '',
+        ];
+
+        $key = drupal_clean_css_identifier(drupal_strtolower($property['label']), $filter);
+        dpm($key);
+        $normalized[$key] = $this->normalizer->normalize($object->$name);
       }
       catch (NotNormalizableValueException $exception) {
         watchdog_exception('gdpr_export', $exception);
