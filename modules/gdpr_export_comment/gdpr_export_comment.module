@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Code for the GDPR export privatemsg module.
+ */
+
+/**
+ * Implements hook_gdpr_export_user_export().
+ */
+function gdpr_export_comment_gdpr_export_user_export($account, $format, $context) {
+  $query = new EntityFieldQuery();
+
+  // Query all messages which were created by the user.
+  $result = $query->entityCondition('entity_type', 'comment')
+    ->propertyCondition('uid', $account->uid)
+    ->execute();
+
+  if (!empty($result['comment'])) {
+    foreach ($result['comment'] as $cid => $comment) {
+      $message = entity_metadata_wrapper('comment', $cid);
+      $data = gdpr_export_serialize_entity($message, $format, $context);
+      file_unmanaged_save_data($data, $context['gdpr_export_dir'] . "/comment_$cid.$format");
+    }
+  }
+}
+
+/**
+ * Implements hook_gdpr_export_normalizer_info().
+ */
+function gdpr_export_comment_gdpr_export_normalizer_info() {
+  return [
+    'GDPRExportComment' => 0,
+  ];
+}

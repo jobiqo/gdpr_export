@@ -1,0 +1,7 @@
+name = GDPR export comment
+description = This module adds support to comments for gdpr_export
+core = 7.x
+package = General Data Protection Regulation
+dependencies[] = gdpr_export
+dependencies[] = comment
+files[] = includes/comment.inc
