@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Code for the GDPR export privatemsg module.
+ */
+
+/**
+ * Implements hook_gdpr_export_user_export().
+ */
+function gdpr_export_privatemsg_gdpr_export_user_export($account, $format, $context) {
+  $query = new EntityFieldQuery();
+
+  // Query all messages which were created by the user.
+  $result = $query->entityCondition('entity_type', 'privatemsg_message')
+    ->propertyCondition('author', $account->uid)
+    ->execute();
+
+  if (!empty($result['privatemsg_message'])) {
+    foreach ($result['privatemsg_message'] as $mid => $message) {
+      $message = entity_metadata_wrapper('privatemsg_message', $mid);
+      $data = gdpr_export_serialize_entity($message, $format, $context);
+      file_unmanaged_save_data($data, $context['gdpr_export_dir'] . "/privatemsg_message_$mid.$format");
+    }
+  }
+}
+
+/**
+ * Implements hook_gdpr_export_normalizer_info().
+ */
+function gdpr_export_privatemsg_gdpr_export_normalizer_info() {
+  return [
+    'GDPRExportPrivatemsgMessage' => 0,
+  ];
+}

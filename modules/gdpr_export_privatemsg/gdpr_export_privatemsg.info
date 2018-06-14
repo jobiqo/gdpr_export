@@ -1,0 +1,7 @@
+name = GDPR export privatemsg
+description = This module adds support to export messages from privatemsg for gdpr_export
+core = 7.x
+package = General Data Protection Regulation
+dependencies[] = gdpr_export
+dependencies[] = privatemsg
+files[] = includes/privatemsg_message.inc
