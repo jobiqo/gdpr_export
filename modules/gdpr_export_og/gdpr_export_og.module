@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Code for the GDPR export profile2 module.
+ */
+
+/**
+ * Implements hook_gdpr_export_user_export().
+ */
+function gdpr_export_og_gdpr_export_user_export($account, $format, $context) {
+  // Add all profile bundles to the export.
+  $query = new EntityFieldQuery();
+
+  $result = $query->entityCondition('entity_type', 'og_membership')
+    ->propertyCondition('entity_type', 'user')
+    ->propertyCondition('etid', $account->uid)
+    ->execute();
+
+  if (isset($result['og_membership'])) {
+    foreach ($result['og_membership'] as $id => $item) {
+      $membership = entity_metadata_wrapper('og_membership', $id);
+      $data = gdpr_export_serialize_entity($membership, $format, $context);
+      file_unmanaged_save_data($data, $context['gdpr_export_dir'] . "/organic_groups_$id.$format");
+    }
+  }
+
+}
+
+/**
+ * Implements hook_gdpr_export_normalizer_info().
+ */
+function gdpr_export_og_gdpr_export_normalizer_info() {
+  return [
+    GDPRExportOGNormalizer => 2
+  ];
+}

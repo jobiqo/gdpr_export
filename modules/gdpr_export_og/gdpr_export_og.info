@@ -1,0 +1,7 @@
+name = GDPR export OG
+description = This module adds support for gdpr_export support to organic groups.
+core = 7.x
+package = General Data Protection Regulation
+dependencies[] = gdpr_export
+dependencies[] = og
+files[] = include/og_normalizer.inc
