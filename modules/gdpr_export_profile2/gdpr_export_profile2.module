@@ -22,8 +22,10 @@ function gdpr_export_profile2_gdpr_export_user_export($account, $format, $contex
 }
 
 /**
- * Implements hook_gdpr_export_normalizer_info_alter().
+ * Implements hook_gdpr_export_normalizer_info().
  */
-function gdpr_export_profile2_gdpr_export_normalizer_info_alter(&$normalizers) {
-  $normalizers['GDPRProfileNormalizer'] = 5;
+function gdpr_export_profile2_gdpr_export_normalizer_info() {
+  return [
+    'GDPRProfileNormalizer' => 5,
+  ];
 }
