@@ -25,8 +25,11 @@ class GDPRExportPrivatemsgMessage extends GDPRExportEntityNormalizer {
       'format',
       'is_new',
     ];
+    $raw = $object->raw();
     foreach ($plain_properties as $property) {
-      $export[$properties] = $this->$property;
+      if (isset($raw->$property)) {
+        $export[$property] = $raw->$property;
+      }
     }
 
     return $export;
