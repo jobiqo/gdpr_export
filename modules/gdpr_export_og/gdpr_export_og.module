@@ -32,6 +32,6 @@ function gdpr_export_og_gdpr_export_user_export($account, $format, $context) {
  */
 function gdpr_export_og_gdpr_export_normalizer_info() {
   return [
-    GDPRExportOGNormalizer => 2
+    'GDPRExportOGNormalizer' => 2
   ];
 }
