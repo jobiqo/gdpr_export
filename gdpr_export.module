@@ -225,8 +225,9 @@ function gdpr_export_form_user_profile_form_alter(&$form, &$form_state, $form_id
   global $user;
   $account_uid = $form['#user']->uid;
 
-  if (user_access('bypass gdpr user export')
-    || $account_uid == $user->uid
+  if ((user_access('bypass gdpr user export')
+    || $account_uid == $user->uid)
+    && empty($form_state['user_pass_reset'])
   ) {
     $form['actions']['gdpr_export_data'] = [
       '#type' => 'submit',
