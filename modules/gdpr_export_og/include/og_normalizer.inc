@@ -31,7 +31,7 @@ class GDPRExportOGNormalizer extends GDPRExportEntityNormalizer {
       ], WATCHDOG_WARNING);
     }
     catch (EntityMetadataWrapperException $exception) {
-      watchdog_exception('gdpr_export', $exception);
+      // We don't care about those exceptions.
     }
 
     $result += $this->getNormalizedFields($object, $format, $context);

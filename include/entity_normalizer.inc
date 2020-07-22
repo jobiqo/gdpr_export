@@ -88,7 +88,7 @@ abstract class GDPRExportEntityNormalizer implements NormalizerInterface, Normal
         ], WATCHDOG_WARNING);
       }
       catch (EntityMetadataWrapperException $exception) {
-        watchdog_exception('gdpr_export', $exception);
+        // We don't care about those exceptions.
       }
     }
 

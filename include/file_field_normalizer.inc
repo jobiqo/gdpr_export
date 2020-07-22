@@ -16,7 +16,14 @@ class GDPRExportFileFieldNormalizer implements NormalizerInterface {
    * @inheritdoc
    */
   public function normalize($object, $format = NULL, array $context = array()) {
-    $file = $object->value();
+    try {
+      $file = $object->value();
+    }
+    catch (EntityMetadataWrapperException $exception) {
+      // If there is some problem with retrieving the file just ignore
+      // the exception and return NULL.
+      return NULL;
+    }
 
     // Check if the export directory was passed to the context and if that
     // directory exists.

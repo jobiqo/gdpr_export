@@ -16,7 +16,14 @@ class GDPRExportImageFieldNormalizer extends GDPRExportFileFieldNormalizer {
    * @inheritdoc
    */
   public function normalize($object, $format = NULL, array $context = array()) {
-    $file = $object->value();
+    try {
+      $file = $object->value();
+    }
+    catch (EntityMetadataWrapperException $exception) {
+      // If there is some problem with retrieving the file just ignore
+      // the exception and return NULL.
+      return NULL;
+    }
 
     $result = parent::normalize($object, $format, $context);
 

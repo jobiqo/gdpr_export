@@ -20,8 +20,8 @@ class GDPRExportTaxonomyTermNormalizer implements NormalizerInterface {
       return $object->name->value();
     }
     catch (EntityMetadataWrapperException $exception) {
-      watchdog_exception('gdpr_export', $exception);
-      return '';
+      // If there is some problem with retrieving the value just return NULL.
+      return NULL;
     }
   }
 

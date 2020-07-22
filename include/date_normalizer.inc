@@ -16,7 +16,14 @@ class GDPRExportDateNormalizer implements NormalizerInterface {
    */
   public function normalize($object, $format = NULL, array $context = array()) {
     // Export the date in the ISO 8601 format.
-    return date('c', $object->value());
+    try {
+      return date('c', $object->value());
+    }
+    catch (EntityMetadataWrapperException $exception) {
+      // If there is some problem with retrieving the date just ignore
+      // the exception and return NULL.
+      return NULL;
+    }
   }
 
   /**

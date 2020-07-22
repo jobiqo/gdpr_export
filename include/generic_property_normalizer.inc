@@ -16,7 +16,13 @@ class GDPRExportGenericDataNormalizer implements NormalizerInterface {
    * @inheritdoc
    */
   public function normalize($object, $format = NULL, array $context = array()) {
-    return $object->value();
+    try {
+      return $object->value();
+    }
+    catch (EntityMetadataWrapperException $exception) {
+      // If there is some problem with retrieving the value just return NULL.
+      return NULL;
+    }
   }
 
   /**

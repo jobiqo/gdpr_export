@@ -19,12 +19,15 @@ class GDPRExportListNormalizer implements NormalizerInterface, NormalizerAwareIn
    * @inheritdoc
    */
   public function normalize($object, $format = NULL, array $context = array()) {
-    $info = $object->info();
-    $type = entity_property_list_extract_type($info['type']);
-
     $result = [];
-    foreach ($object as $item) {
-      $result[] = $this->normalizer->normalize($item, $format, $context);
+    try {
+      foreach ($object as $item) {
+        $result[] = $this->normalizer->normalize($item, $format, $context);
+      }
+    }
+    catch (EntityMetadataWrapperException $exception) {
+      // If there is some problem with retrieving the list values just ignore
+      // the exception and return what we have so far in the list.
     }
     return $result;
   }
